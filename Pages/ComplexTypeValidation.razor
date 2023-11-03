@@ -1,0 +1,79 @@
+﻿@page "/ComplexTypevalidation"
+
+@using System.Dynamic
+@using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.Form
+
+<h3>Complex type validation</h3>
+
+<div class="mt-4" style="margin: 0 auto;">
+    <SfDataForm Model="@MyModel">
+        <FormValidation>
+            <ObjectGraphDataAnnotationsValidator></ObjectGraphDataAnnotationsValidator>
+        </FormValidation>
+        <FormItems>
+            <FormItem Field="@nameof(MyModel.Child.Child.FirstName)"  LabelText="FirstName"></FormItem>
+            <FormItem Field="@nameof(MyModel.Child.Child.LastName)" LabelText="LastName"> </FormItem>
+            <FormItem Field="@nameof(MyModel.Child.Child.Email)" LabelText="Email" Placeholder="someone@example.com"> </FormItem>
+            <FormItem Field="@nameof(MyModel.Child.Child.Password)"  LabelText="Password"></FormItem>
+            <FormItem Field="@nameof(MyModel.Child.Child.ConfirmPassword)" LabelText="Confirm Password"></FormItem>
+            <FormItem Field="@nameof(MyModel.Child.Child.Accept)" LabelText="Terms and Conditions" EditorType="FormEditorType.Switch"></FormItem>
+        </FormItems>
+    </SfDataForm>
+</div>
+@code {
+    TestModel MyModel { get; set; } = new TestModel();
+
+    abstract class TestBaseClass
+    {
+        [Required(ErrorMessage = "Enter FirstName here")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Enter LastName here")]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Enter Password here")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Enter Confirm Password here")]
+        public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Enter Email here")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Enter Date here")]
+        public DateTime? Date1 { get; set; }
+
+        [Required(ErrorMessage = "You need to agree to the Terms and Conditions")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You need to agree to the Terms and Conditions")]
+        public bool Accept { get; set; }
+    }
+
+    class TestGrandChildModel : TestBaseClass
+    {
+    }
+
+    class TestChildModel : TestBaseClass
+    {
+        [ValidateComplexType]
+        public TestGrandChildModel Child { get; set; }
+
+        public TestChildModel()
+        {
+            Child = new TestGrandChildModel();
+        }
+    }
+
+    class TestModel : TestBaseClass
+    {
+        public int Id { get; set; }
+
+        [ValidateComplexType]
+        public TestChildModel Child { get; set; }
+
+        public TestModel()
+        {
+            Child = new TestChildModel();
+        }
+    }
+}

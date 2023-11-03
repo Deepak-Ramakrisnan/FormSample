@@ -1,0 +1,165 @@
+﻿@page "/template"
+
+@using Syncfusion.Blazor.Form
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars;
+@using Syncfusion.Blazor.Popups
+
+<PageTitle>SfDataForm component</PageTitle>
+
+<h3>Template</h3>
+
+<SfDataForm ID="MyForm"
+        Model="@exampleModel"
+        Width="50%"
+        Columns=1
+        ColumnSpacing="20px"
+        LabelPosition="FormLabelPosition.Top"
+        ButtonsAlignment="FormButtonsAlignment.Right"
+        ValidationMessageDisplay="@Validation" OnSubmit="HandleFormSubmit" OnUpdate="FormUpdate">
+    <FormValidation>
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        @*<ValidationSummary></ValidationSummary>*@
+    </FormValidation>
+    <FormItems>
+        <FormItem Field="@nameof(exampleModel.FirstName)">
+            <Template>
+                <div>
+                    <label>First Name</label>
+                    <SfTextBox ></SfTextBox>
+                </div>
+            </Template>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.LastName)" >
+            <div>
+                <label>Last Name</label>
+                <SfTextBox Placeholder="Testing Template"></SfTextBox>
+            </div>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Date1)" >
+            <div>
+                <label>Age</label>
+                <SfNumericTextBox Min=18 Max=100></SfNumericTextBox>
+            </div>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Email)" LabelText="Customer Id" Placeholder="someone@example.com">
+            <div>
+                <label>Customer Id</label>
+                <SfMaskedTextBox Placeholder="Testing Template" Mask="AA-AAAA000"></SfMaskedTextBox>
+            </div>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Sex)" EditorType="FormEditorType.DropdownList">
+            <Template>
+                <label>Sex</label>
+                <Syncfusion.Blazor.DropDowns.SfDropDownList TValue="string" TItem="string" @bind-Value="@exampleModel.Sex" DataSource="@data"></Syncfusion.Blazor.DropDowns.SfDropDownList>
+            </Template>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Address1)" >
+            <div>
+                <label>Address Line 1</label>
+                <SfTextBox Multiline="true" @bind-Value="@exampleModel.Address1"></SfTextBox>
+            </div>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Address2)" >
+            <div>
+                <label>Address Line 2</label>
+                <SfTextBox Multiline="true" @bind-Value="@exampleModel.Address2"></SfTextBox>
+            </div>
+        </FormItem>
+        <FormItem Field="@nameof(exampleModel.Accept)" >
+            <div>
+                <label>Agree to the Terms and Conditions</label>
+                <SfCheckBox @bind-Checked="@exampleModel.Accept"></SfCheckBox>
+            </div>
+        </FormItem>
+    </FormItems>
+
+    <FormButtons>
+        <SfButton>Submit</SfButton>
+    </FormButtons>
+
+</SfDataForm>
+
+@code {
+
+    private void FormUpdate(FormUpdateEventArgs args)
+    {
+
+    }
+
+    private async Task HandleFormSubmit(EditContext editContext)
+    {
+        bool isFormValid = editContext.Validate();
+
+        if (isFormValid)
+        {
+            //apply some custom logic when the form is valud
+        }
+        else
+        {
+            //apply some custom logic when the form is not valid
+        }
+    }
+
+    public string[] data = new string[] { "Male", "Female", "Others" };
+
+    SfDataForm? validate;
+
+    FormValidationMessageDisplay Validation { get; set; } = FormValidationMessageDisplay.Inline;
+
+    public void ChangeProperty()
+    {
+        Validation = FormValidationMessageDisplay.Inline;
+
+    }
+
+    public void ChangePropertyInline()
+    {
+        Validation = FormValidationMessageDisplay.Tooltip;
+    }
+
+    EditContext myEditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        myEditContext = new EditContext(exampleModel);
+        base.OnInitialized();
+    }
+
+    public class ExampleModel
+    {
+        [Required(ErrorMessage = "Enter FirstName here")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Enter LastName here")]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Enter Password here")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Enter Confirm Password here")]
+        public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Enter E-mail here")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Enter Address Line 1 here")]
+        public string Address1 { get; set; }
+
+        public string Address2 { get; set; }
+
+        [Required(ErrorMessage = "Enter Date here")]
+        public DateTime? Date1 { get; set; }
+
+        [Required(ErrorMessage = "You need to choose the gender")]
+        public string Sex { get; set; }
+
+        [Required(ErrorMessage = "You must agree to the Terms and Conditions")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You must agree to the Terms and Conditions")]
+        public bool Accept { get; set; }
+    }
+    private ExampleModel exampleModel = new ExampleModel();
+}

@@ -1,0 +1,119 @@
+﻿@page "/Tooltipvalidation"
+
+@using Syncfusion.Blazor.Form
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars;
+@using Syncfusion.Blazor.Popups
+
+<PageTitle>SfDataForm component</PageTitle>
+
+<h3>ToolTip Validation</h3>
+
+<SfDataForm ID="MyForm"
+        Model="@exampleModel"
+        Width="50%"
+        Columns=1
+        ColumnSpacing="20px"
+        LabelPosition="FormLabelPosition.Top"
+        ButtonsAlignment="FormButtonsAlignment.Right"
+        ValidationMessageDisplay="@Validation" OnSubmit="HandleFormSubmit" OnUpdate="FormUpdate">
+    <FormValidation>
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        @*<ValidationSummary></ValidationSummary>*@
+    </FormValidation>
+    <FormItems>
+        <FormItem Field="@nameof(exampleModel.FirstName)" LabelText="FirstName"></FormItem>
+        <FormItem Field="@nameof(exampleModel.LastName)" LabelText="LastName"> </FormItem>
+        <FormItem Field="@nameof(exampleModel.Email)" LabelText="Email" Placeholder="someone@example.com"> </FormItem>
+        <FormItem Field="@nameof(exampleModel.Date1)" LabelText="Date Of Birth" EditorType="FormEditorType.DatePicker" Placeholder="M/d/yyyy" IsEnabled="true" CssClass="e-outine"></FormItem>
+        <FormItem Field="@nameof(exampleModel.Password)" LabelText="Password"> </FormItem>
+        <FormItem Field="@nameof(exampleModel.ConfirmPassword)" LabelText="Confirm Password"> </FormItem>
+        <FormItem Field="@nameof(exampleModel.Accept)" LabelText="Terms and Conditions" EditorType="FormEditorType.Switch"></FormItem>
+    </FormItems>
+
+    <FormButtons>
+        <SfButton>Submit</SfButton>
+    </FormButtons>
+
+</SfDataForm>
+
+@code {
+
+    private void FormUpdate(FormUpdateEventArgs args)
+    {
+
+    }
+
+    private async Task HandleFormSubmit(EditContext editContext)
+    {
+        bool isFormValid = editContext.Validate();
+
+        if (isFormValid)
+        {
+            //apply some custom logic when the form is valud
+        }
+        else
+        {
+            //apply some custom logic when the form is not valid
+        }
+    }
+
+    SfDataForm? validate;
+
+    FormValidationMessageDisplay Validation { get; set; } = FormValidationMessageDisplay.Tooltip;
+
+    public void ChangeProperty()
+    {
+        Validation = FormValidationMessageDisplay.Inline;
+
+    }
+
+    public void ChangePropertyInline()
+    {
+        Validation = FormValidationMessageDisplay.Tooltip;
+    }
+
+    EditContext myEditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        myEditContext = new EditContext(exampleModel);
+        base.OnInitialized();
+    }
+
+    public class ExampleModel
+    {
+
+        [Required(ErrorMessage = "Enter FirstName here")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Enter LastName here")]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Enter password here")]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Enter Confirm password here")]
+        public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Enter Email here")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Enter Date here")]
+        public DateTime? Date1 { get; set; }
+
+        [Required(ErrorMessage = "You need to agree to the Terms and Conditions")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You need to agree to the Terms and Conditions")]
+        public bool Accept { get; set; }
+    }
+
+    private ExampleModel exampleModel = new ExampleModel();
+
+
+
+
+
+}

@@ -1,0 +1,147 @@
+﻿@page "/BlazoredValidation"
+
+@using Syncfusion.Blazor.Form
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars;
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using FluentValidation
+
+<PageTitle>SfDataForm component</PageTitle>
+
+<h3>Blazored Fluent Validator</h3>
+
+<SfDataForm ID="MyForm"
+        Model="@exampleModel"
+        Width="50%"
+        Columns=1
+        ColumnSpacing="20px"
+        LabelPosition="FormLabelPosition.Top"
+        ButtonsAlignment="FormButtonsAlignment.Right"
+        ValidationMessageDisplay="@Validation" OnSubmit="HandleFormSubmit" OnUpdate="FormUpdate">
+    <FormValidation>
+        <Blazored.FluentValidation.FluentValidationValidator Validator="custVal" />
+        @*<ValidationSummary></ValidationSummary>*@
+    </FormValidation>
+    <FormItems>
+        <FormGroup LabelText="Payment Details">
+            <FormItem Field="@nameof(exampleModel.FirstName)" LabelText="Full Name on Card"></FormItem>
+            <FormItem Field="@nameof(exampleModel.CardNumber)" LabelText="Card Number"></FormItem>
+            <FormItem Field="@nameof(exampleModel.ExpirationDate)" LabelText="Expiration Date">
+               @* <Template>
+                    <SfDatePicker EnableMask="true" Format="MM/YY" @bind-Value="@exampleModel.ExpirationDate"></SfDatePicker>
+                </Template>*@
+            </FormItem>
+            <FormItem Field="@nameof(exampleModel.CardNumber)" LabelText="Expiration Date" ColumnSpan="2"></FormItem>
+            <FormItem Field="@nameof(exampleModel.CVV)" LabelText="CVV/CVC" ColumnSpan="2">
+               @* <Template>
+                    <SfMaskedTextBox Mask="000" PromptChar="' '" @bind-Value="@exampleModel.CVV" ></SfMaskedTextBox>
+                </Template>*@
+            </FormItem>
+            <FormItem Field="@nameof(exampleModel.BillingAddress)" LabelText="Billing Address">
+               @* <Template>
+                    <SfTextBox Multiline="true" @bind-Value="@exampleModel.BillingAddress"></SfTextBox>
+                </Template>*@
+            </FormItem>
+            <FormItem Field="@nameof(exampleModel.Accept)" EditorType="FormEditorType.Switch" LabelText="I agree to the terms and conditions"></FormItem>
+        </FormGroup>
+    </FormItems>
+
+    <FormButtons>
+        <SfButton>Submit</SfButton>
+    </FormButtons>
+
+</SfDataForm>
+
+@code {
+
+    private void FormUpdate(FormUpdateEventArgs args)
+    {
+
+    }
+
+    private async Task HandleFormSubmit(EditContext editContext)
+    {
+        bool isFormValid = editContext.Validate();
+
+        if (isFormValid)
+        {
+            //apply some custom logic when the form is valud
+        }
+        else
+        {
+            //apply some custom logic when the form is not valid
+        }
+    }
+
+    SfDataForm? validate;
+
+    FormValidationMessageDisplay Validation { get; set; } = FormValidationMessageDisplay.Inline;
+
+    public void ChangeProperty()
+    {
+        Validation = FormValidationMessageDisplay.Inline;
+
+    }
+
+    public void ChangePropertyInline()
+    {
+        Validation = FormValidationMessageDisplay.Tooltip;
+    }
+
+    EditContext myEditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        myEditContext = new EditContext(exampleModel);
+        base.OnInitialized();
+    }
+
+    public class ExampleModel
+    {
+
+        [Required(ErrorMessage = "Enter Name on the card")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Enter Billing Address")]
+        public string BillingAddress { get; set; }
+
+        [Required(ErrorMessage = "Enter Card number")]
+        public string CardNumber { get; set; }
+
+        [Required(ErrorMessage = "Enter Count here")]
+        public DateTime? ExpirationDate { get; set; }
+
+        [Required(ErrorMessage = "Enter CVV/CVC")]
+        public string CVV { get; set; }
+
+        [Required(ErrorMessage = "You need to agree to the Terms and Conditions")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "You need to agree to the Terms and Conditions")]
+        public bool Accept { get; set; }
+    }
+
+    private ExampleModel exampleModel = new ExampleModel();
+
+    CustomerValidator custVal = new CustomerValidator();
+
+    void SaveCustomer()
+    {
+        Console.WriteLine("TODO: Actually do something with the valid data");
+    }
+    public class CustomerValidator : AbstractValidator<ExampleModel>
+    {
+        public CustomerValidator()
+        {
+            RuleFor(customer => customer.FirstName).NotEmpty().MinimumLength(5).MaximumLength(50);
+            RuleFor(customer => customer.CardNumber).NotEmpty().CreditCard();
+            RuleFor(customer => customer.ExpirationDate).NotEmpty();
+            RuleFor(customer => customer.CVV).NotEmpty().Length(3);
+            RuleFor(customer => customer.BillingAddress).NotEmpty().WithMessage("Please specify a billing address");
+            RuleFor(customer => customer.Accept).Equal(true).WithMessage("You must accept the terms and conditions to proceed further");
+        }
+    }
+}

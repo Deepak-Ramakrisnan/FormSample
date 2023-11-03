@@ -1,0 +1,112 @@
+﻿@page "/1"
+
+@using Syncfusion.Blazor.Form
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars;
+@using Syncfusion.Blazor.Popups
+
+<PageTitle>SfDataForm component</PageTitle>
+
+@exampleModel.ddlVal
+<br />
+<br />
+@exampleModel.text
+<h3>Default Form Validator</h3>
+
+
+
+<SfDataForm ID="MyForm"
+        Model="@exampleModel"
+        Width="50%"
+        Columns=1
+        ColumnSpacing="20px"
+        LabelPosition="FormLabelPosition.Top"
+        ButtonsAlignment="FormButtonsAlignment.Right"
+        ValidationMessageDisplay="@Validation" OnSubmit="HandleFormSubmit" OnUpdate="FormUpdate">
+    <FormValidation>
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        @*<ValidationSummary></ValidationSummary>*@
+    </FormValidation>
+    <FormItems>
+        <FormItem Field="@nameof(exampleModel.ddlVal)" LabelText="LastName" >  </FormItem>
+    </FormItems>
+
+    <FormButtons>
+        <SfButton>Submit</SfButton>
+    </FormButtons>
+
+</SfDataForm>
+
+@code {
+    public Dictionary<string, object> attribute = new Dictionary<string, object>() { { "Format", "MM/yy" } };
+    private void FormUpdate(FormUpdateEventArgs args)
+    {
+
+    }
+
+    private async Task HandleFormSubmit(EditContext editContext)
+    {
+        bool isFormValid = editContext.Validate();
+
+        if (isFormValid)
+        {
+            //apply some custom logic when the form is valud
+        }
+        else
+        {
+            //apply some custom logic when the form is not valid
+        }
+    }
+
+    SfDataForm? validate;
+
+    FormValidationMessageDisplay Validation { get; set; } = FormValidationMessageDisplay.Inline;
+
+    public void ChangeProperty()
+    {
+        Validation = FormValidationMessageDisplay.Inline;
+
+    }
+
+    public void ChangePropertyInline()
+    {
+        Validation = FormValidationMessageDisplay.Tooltip;
+    }
+
+    EditContext myEditContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        myEditContext = new EditContext(exampleModel);
+        base.OnInitialized();
+    }
+
+    public class ExampleModel
+    {
+        [Required]
+        public Values ddlVal { get; set; }
+
+        public enum Values
+        {
+            Australia,
+            Bermuda,
+            Canada,
+            Denmark,
+            India,
+            US
+        }
+
+        [Required]
+        public string text { get; set; }
+    }
+
+    private ExampleModel exampleModel = new ExampleModel();
+
+
+
+
+
+}

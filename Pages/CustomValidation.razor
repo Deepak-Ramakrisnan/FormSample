@@ -1,0 +1,134 @@
+﻿@page "/CustomValidation"
+
+@using System.ComponentModel.DataAnnotations;
+@using System.Collections.Generic;
+@using System;
+@using Syncfusion.Blazor.Form;
+@using Syncfusion.Blazor.Buttons;
+@using System.Text.RegularExpressions;
+  
+<h3>Custom validation</h3>
+
+<SfDataForm ID="MyForm"
+        Model="@_product"
+        Width="50%"
+        Columns=1
+        ColumnSpacing="20px"
+        LabelPosition="FormLabelPosition.Top"
+        ButtonsAlignment="FormButtonsAlignment.Right"
+        ValidationMessageDisplay="@Validation" OnSubmit="HandleFormSubmit" OnUpdate="FormUpdate">
+    <FormValidation>
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+    </FormValidation>
+    <FormItems>
+        <FormGroup LabelText="Sign Up Details">
+            <FormItem Field="@nameof(_product.Name)" LabelText="FirstName"></FormItem>
+            <FormItem Field="@nameof(_product.Email)" LabelText="Email Id"></FormItem>
+            <FormItem Field="@nameof(_product.Organization)" LabelText="Password"> </FormItem>
+            <FormItem Field="@nameof(_product.ConfirmPassword)" LabelText="Confirm Password"> </FormItem>
+        </FormGroup>
+    </FormItems>
+
+    <FormButtons>
+        <SfButton>Submit</SfButton>
+    </FormButtons>
+
+</SfDataForm>
+
+
+@code {
+    private async Task HandleFormSubmit(EditContext editContext)
+    {
+        bool isFormValid = editContext.Validate();
+
+        if (isFormValid)
+        {
+            //apply some custom logic when the form is valud
+        }
+        else
+        {
+            //apply some custom logic when the form is not valid
+        }
+    }
+    private void FormUpdate(FormUpdateEventArgs args)
+    {
+
+    }
+
+    FormValidationMessageDisplay Validation { get; set; } = FormValidationMessageDisplay.Inline;
+    private EmployeeDetails _product = new EmployeeDetails();
+    public void Submit() =>
+        Console.WriteLine($"{_product.Name}, {_product.Organization}");
+
+    public class EmployeeDetails
+    {
+        [Required]
+        public string? Name { get; set; }
+        
+        [Required]
+        [OrganizationValidation(ErrorMessage = "This field should not be Empty")]
+        public string? Organization { get; set; }
+
+        [Required]
+        [OrganizationValidation(ErrorMessage = "This field should not be Empty")]
+        [Compare("Organization", ErrorMessage = "Confirm Password must match Password")]
+        public string? ConfirmPassword { get; set; }
+
+        [Required]
+        [CustomEmailValidation(ErrorMessage = "This field should not be Empty")]
+        public string? Email { get; set; }
+    }
+
+    public class OrganizationValidationAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            string fieldValue = value as string;
+
+            if (fieldValue.Length < 10)
+            {
+                return new ValidationResult("Password should have at least 10 characters", new[] { validationContext.MemberName });
+            }
+
+            // Check if there is at least one uppercase letter
+            if (!Regex.IsMatch(fieldValue, @"[A-Z]"))
+            {
+                return new ValidationResult("Password should contain at least one uppercase letter", new[] { validationContext.MemberName });
+            }
+
+            // Check if there is at least one lowercase letter
+            if (!Regex.IsMatch(fieldValue, @"[a-z]"))
+            {
+                return new ValidationResult("Password should contain at least one lowercase letter", new[] { validationContext.MemberName });
+            }
+
+            // Check if there is at least one special character (you can modify the pattern for your specific special characters)
+            if (!Regex.IsMatch(fieldValue, @"[@#$%^&+=]"))
+            {
+                return new ValidationResult("Password should contain at least one special character", new[] { validationContext.MemberName });
+            }
+
+            return ValidationResult.Success;
+        }
+    }
+
+    public class CustomEmailValidationAttribute : ValidationAttribute
+    {
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        {
+            string email = value as string;
+
+            if (!IsValidEmail(email))
+            {
+                return new ValidationResult("Email address is not valid..", new[] { validationContext.MemberName });
+            }
+
+            return ValidationResult.Success;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            return Regex.IsMatch(email, @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$");
+        }
+    }
+}
